@@ -41,12 +41,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             R.id.map_fragment
         ) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        binding.getLocation.setOnClickListener {
-            requestLocationPermissions()
-            getLastLocation()
-        }
-
     }
 
     @SuppressLint("MissingPermission")
