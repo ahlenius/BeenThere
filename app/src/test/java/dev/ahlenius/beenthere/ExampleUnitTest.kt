@@ -11,7 +11,7 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun failingDummyTest() {
-        assertEquals(5, 4)
+    fun addition_works() {
+        assertEquals(4, 2 + 2)
     }
 }

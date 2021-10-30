@@ -1,5 +1,6 @@
 package dev.ahlenius.beenthere
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,13 +13,21 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MarkerOptions
 import dev.ahlenius.beenthere.databinding.ActivityMainBinding
+import com.google.android.gms.maps.model.LatLng
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+    private var lastLocation: Location = createDummyLocation()
+
+    lateinit var map: GoogleMap
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var binding: ActivityMainBinding
-    val PERMISSION_ID = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,24 +37,51 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        binding.getLocation.setOnClickListener {
-            Log.d("Debug:", hasLocationPermissions().toString())
-            Log.d("Debug:", isLocationEnabled().toString())
+        val mapFragment = supportFragmentManager.findFragmentById(
+            R.id.map_fragment
+        ) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
+        binding.getLocation.setOnClickListener {
             requestLocationPermissions()
             getLastLocation()
         }
 
     }
 
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(map: GoogleMap) {
+        val stockholmPosition = LatLng(59.334591, 18.063240)
+        getLastLocation()
+        this.map = map
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    this.lastLocation.latitude,
+                    this.lastLocation.longitude
+                ),
+                6.toFloat()
+            )
+        )
+        map.addMarker(MarkerOptions().position(stockholmPosition))
+        map.isMyLocationEnabled = true
+    }
+
+    private fun createDummyLocation(): Location {
+        val location = Location("Dummy")
+        location.latitude = 0.0
+        location.longitude = 0.0
+        return location
+    }
+
     fun hasLocationPermissions(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             return true
@@ -58,10 +94,10 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             ),
-            PERMISSION_ID
+            42 // Any number will do
         )
     }
 
@@ -81,9 +117,10 @@ class MainActivity : AppCompatActivity() {
                     if (location == null) {
                         newLocationData()
                     } else {
-                        Log.d("Debug:", "Your Location:" + location.longitude)
+                        Log.d("Debug:", "Long ${location.longitude}, Lat ${location.latitude}")
                         binding.locationText.text =
                             "Long: ${location.longitude}, Lat: ${location.latitude}"
+                        this.lastLocation = location
                     }
                 }
             } else {

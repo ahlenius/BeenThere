@@ -5,27 +5,16 @@
     android:layout_height="match_parent"
     android:padding="4dp"
     tools:context=".MainActivity">
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
-        android:background="#008080"
-        android:padding="5dp"
-        android:text="BeenThere!"
-        android:textColor="#fff"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
+    <fragment
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
     <Button
         android:id="@+id/getLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
         android:layout_centerInParent="true"
-        android:layout_marginTop="40dp"
         android:text="Get location" />
     <TextView
         android:id="@+id/locationText"
@@ -33,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="Current GPS Location"
+        android:layout_below="@+id/getLocation"
         android:textColor="#000"
         android:textSize="24sp"
         android:textStyle="bold" />
