@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     lastLocation.latitude,
                     lastLocation.longitude
                 ),
-                6.toFloat()
+                8.toFloat()
             )
         )
         map.isMyLocationEnabled = true
