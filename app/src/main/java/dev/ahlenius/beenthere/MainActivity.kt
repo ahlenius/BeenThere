@@ -18,6 +18,12 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import dev.ahlenius.beenthere.databinding.ActivityMainBinding
+import com.google.firebase.database.DatabaseReference
+
+import com.google.firebase.database.FirebaseDatabase
+
+
+
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -29,6 +35,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var binding: ActivityMainBinding
     private lateinit var map: GoogleMap
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +50,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         ) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        database = FirebaseDatabase.getInstance("https://beenthere-1-default-rtdb.europe-west1.firebasedatabase.app")
+        val myRef = database.getReference("message")
+
+        myRef.setValue("Hello, World!")
         startLocationUpdates()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(map: GoogleMap) {
+        this.map = map
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    lastLocation.latitude,
+                    lastLocation.longitude
+                ),
+                8.toFloat()
+            )
+        )
+        map.isMyLocationEnabled = true
     }
 
     @SuppressLint("MissingPermission")
@@ -62,21 +88,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(map: GoogleMap) {
-        this.map = map
-        map.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    lastLocation.latitude,
-                    lastLocation.longitude
-                ),
-                8.toFloat()
-            )
-        )
-        map.isMyLocationEnabled = true
     }
 
     private fun hasLocationPermissions(): Boolean {
