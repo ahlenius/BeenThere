@@ -18,12 +18,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import dev.ahlenius.beenthere.databinding.ActivityMainBinding
-import com.google.firebase.database.DatabaseReference
-
-import com.google.firebase.database.FirebaseDatabase
-
-
-
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -35,25 +29,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var binding: ActivityMainBinding
     private lateinit var map: GoogleMap
-    private lateinit var database: FirebaseDatabase
+    private lateinit var database: Database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        database = Database()
 
         val mapFragment = supportFragmentManager.findFragmentById(
             R.id.map_fragment
         ) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        database = FirebaseDatabase.getInstance("https://beenthere-1-default-rtdb.europe-west1.firebasedatabase.app")
-        val myRef = database.getReference("message")
-
-        myRef.setValue("Hello, World!")
         startLocationUpdates()
     }
 
@@ -143,6 +134,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             binding.locationText.text =
                 "Long: ${lastLocation.longitude} , Lat: ${lastLocation.latitude}"
+            database.addLocation(lastLocation)
         }
     }
 }
